@@ -1,0 +1,27 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: oapui
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "oapui.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "oapui.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.oapui.image.servicename }}
+          image: "{{ .Values.oapui.image.repository }}/{{ .Values.oapui.image.project }}/{{ .Values.oapui.image.servicename }}:{{ .Values.oapui.image.tag  }}"
+          imagePullPolicy: {{ .Values.oapui.image.pullPolicy }}
+          env:
+            - name: SW_OAP_ADDRESS
+              value: http://skywalking-oap:12800
+          ports:
+            - name: page
+              containerPort: {{ .Values.oapui.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.oapui.resources | nindent 12 }}

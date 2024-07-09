@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "logstash.selectorLabels" . | nindent 6 }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "logstash.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: ES_JAVA_OPTS
+          value: {{ .Values.logstash.jvm }}
+        - name: TZ
+          value: Asia/Shanghai
+        image: {{ .Values.logstash.image.repository }}/{{ .Values.logstash.image.project }}/{{ .Values.logstash.image.servicename }}:{{ .Values.logstash.image.tag  }}
+        imagePullPolicy: {{ .Values.logstash.image.pullPolicy }}
+        name: {{ .Values.logstash.image.servicename }}
+        ports:
+        - containerPort: 5044
+          name: logstash
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.kibana.resources | nindent 10 }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /usr/share/logstash/pipeline/logstash.conf
+          name: logstash-conf
+          subPath: logstash.conf
+        - mountPath: /etc/localtime
+          name: timezone
+        - mountPath: /usr/share/logstash/config/logstash.yml
+          name: logstash-yml
+          subPath: logstash.yml
+        - mountPath: /usr/share/logstash/template/automated-test-log-template.json
+          name: logstash-template-auto
+          subPath: automated-test-log-template.json
+        - mountPath: /usr/share/logstash/template/hive-log-template.json
+          name: logstash-template-hive
+          subPath: hive-log-template.json
+      - image: {{ .Values.logstash.image.repository }}/{{ .Values.logstash.image.project }}/logstash_exporter:latest
+        imagePullPolicy: Always
+        name: logstashexporter
+        ports:
+        - containerPort: 9198
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: timezone
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: automated-test-log-template.json
+            path: automated-test-log-template.json
+          name: logstash-template-auto
+        name: logstash-template-auto
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: hive-log-template.json
+            path: hive-log-template.json
+          name: logstash-template-hive
+        name: logstash-template-hive
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: logstash.yml
+            path: logstash.yml
+          name: logstash-yml
+        name: logstash-yml
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: logstash.conf
+            path: logstash.conf
+          name: logstash-conf
+        name: logstash-conf

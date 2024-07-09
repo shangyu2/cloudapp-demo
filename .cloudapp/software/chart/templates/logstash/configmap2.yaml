@@ -1,0 +1,7 @@
+apiVersion: v1  
+kind: ConfigMap  
+metadata:  
+  name: logstash-template-auto
+data:  
+  automated-test-log-template.json: |  
+{{ (.Files.Get "files/automated-test-log-template.json") | indent 4 }}

@@ -1,0 +1,182 @@
+{
+  "index_patterns": [
+    "hivelog-*"
+  ],
+  "order": 0,
+  "version": 60001,
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "refresh_interval": "5s",
+      "lifecycle": {
+          "name": "7-days-default"
+       }
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "auto_keyword": {
+          "match_mapping_type": "string",
+          "match": "*",
+          "mapping": {
+            "type": "keyword",
+            "norms": false
+          },
+          "path_match": "*"
+        }
+      }
+    ],
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "@version": {
+        "type": "keyword"
+      },
+      "agent": {
+        "properties": {
+          "ephemeral_id": {
+            "type": "text"
+          },
+          "hostname": {
+            "type": "text"
+          },
+          "id": {
+            "type": "text"
+          },
+          "name": {
+            "type": "text"
+          },
+          "type": {
+            "type": "text"
+          },
+          "version": {
+            "type": "text"
+          }
+        }
+      },
+      "appName": {
+        "type": "keyword"
+      },
+      "date": {
+        "type": "date"
+      },
+      "ecs": {
+        "properties": {
+          "version": {
+            "type": "text"
+          }
+        }
+      },
+      "env": {
+        "type": "keyword"
+      },
+      "errorCode": {
+        "type": "keyword"
+      },
+      "exception": {
+        "properties": {
+          "exception_class": {
+            "type": "text"
+          },
+          "exception_message": {
+            "type": "text"
+          },
+          "stacktrace": {
+            "type": "text"
+          }
+        }
+      },
+      "geoip": {
+        "properties": {
+          "ip": {
+            "type": "ip"
+          },
+          "latitude": {
+            "type": "half_float"
+          },
+          "location": {
+            "type": "geo_point"
+          },
+          "longitude": {
+            "type": "half_float"
+          }
+        }
+      },
+      "host": {
+        "properties": {
+          "name": {
+            "type": "keyword"
+          }
+        }
+      },
+      "hostName": {
+        "type": "keyword"
+      },
+      "input": {
+        "properties": {
+          "type": {
+            "type": "text"
+          }
+        }
+      },
+      "ip": {
+        "type": "keyword"
+      },
+      "level": {
+        "type": "keyword"
+      },
+      "log": {
+        "properties": {
+          "file": {
+            "properties": {
+              "path": {
+                "type": "text"
+              }
+            }
+          },
+          "offset": {
+            "type": "long"
+          }
+        }
+      },
+      "loggerName": {
+        "type": "text"
+      },
+      "logs_type": {
+        "type": "text"
+      },
+      "message": {
+        "type": "text",
+        "norms": false
+      },
+      "msg": {
+        "type": "text"
+      },
+      "thread": {
+        "type": "text"
+      },
+      "trace": {
+        "properties": {
+          "errcode": {
+            "type": "keyword"
+          },
+          "ip": {
+            "type": "keyword"
+          },
+          "traceId": {
+            "type": "keyword"
+          }
+        }
+      },
+      "traceId": {
+        "type": "keyword"
+      }
+    }
+  },
+  "aliases": {
+
+  }
+}
+

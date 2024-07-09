@@ -1,0 +1,7 @@
+apiVersion: v1  
+kind: ConfigMap  
+metadata:  
+  name: logstash-template-hive 
+data:  
+  hive-log-template.json: |
+{{ (.Files.Get "files/hive-log-template.json") | indent 4 }}

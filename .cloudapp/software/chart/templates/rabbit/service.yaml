@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbit
+spec:
+  ports:
+  - name: rabbita
+    port: {{ .Values.rabbit.service.amqp.port }}
+    nodePort: {{ .Values.rabbit.service.amqp.nodePort }}
+    protocol: TCP
+    targetPort: {{ .Values.rabbit.service.amqp.targetPort }}
+  - name: rabbitb
+    port: {{ .Values.rabbit.service.manager.port }}
+    nodePort: {{ .Values.rabbit.service.manager.nodePort }}
+    protocol: TCP
+    targetPort: {{ .Values.rabbit.service.manager.targetPort }}
+  selector:
+    {{- include "rabbit.selectorLabels" . | nindent 4 }}
+  type: {{ .Values.rabbit.service.type }}

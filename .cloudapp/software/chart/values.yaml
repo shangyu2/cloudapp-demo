@@ -1,0 +1,321 @@
+global:
+  storageClass: example-nfs
+  url: 10.20.31.56
+  user: root
+  pass: ccn123
+  port: 32306
+  xxl:
+    database: xxl_job 
+  env: dev
+  nacos:
+    host: 10.20.31.35
+    port: 8848
+  skywalking:
+    host: 10.20.31.35
+    port: 11800
+    image:
+      repository: harbor92.yesno.com.cn
+      project: cncop
+      servicename: skywalking-java-agent
+      pullPolicy: IfNotPresent
+      tag: "8.6.0-alpine-5"
+      imagePullSecrets: []
+favorite:
+  drink: coffee
+  food: pizza
+pizzaToppings:
+  - mushrooms
+  - cheese
+  - peppers
+  - onions
+replicaCount: 0
+zookeeper:
+  labels:
+    app: zookeeper
+  service:
+    type: ClusterIP
+    port: 2181
+    targetPort: 2181
+    labels:
+      app: zookeeper
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: zookeeper
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+    #
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+kafka:
+  advertised_port: 30092
+  advertised_host_name: 10.20.31.34
+  service:
+    type: NodePort
+    port: 9092
+    targetPort: 9092
+    nodePort: 30092
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: kafka
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+    #
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+rabbit:
+  appsName: rabbit
+  rabbitmq_user: ccnadmin
+  rabbitmq_pass: ccn123
+  service:
+    type: NodePort
+    amqp:
+      port: 5672
+      targetPort: 5672
+      nodePort: 31518
+    manager:
+      port: 15672
+      targetPort: 15672
+      nodePort: 31517
+  image:
+    repository: harbor92.yesno.com.cn
+    project: ceph
+    servicename: rabbitmq
+    pullPolicy: IfNotPresent
+    tag: "3.8-management"
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+xxljob:
+  appsName: xxljob
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 8099
+    nodePort: 30016
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: xxl-job
+    pullPolicy: IfNotPresent
+    tag: "2.3.0.325"
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+elasticsearch:
+  appsName: elasticsearch
+  service:
+    type: NodePort
+    http:
+      port: 9200
+      targetPort: 9200
+      nodePort: 30192
+    transport:
+      port: 9300
+      targetPort: 9300
+      nodePort: 30093
+  master: elasticsearch-master-0,
+  jvm: -Xmx2g -Xms2g
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: elasticsearch
+    pullPolicy: IfNotPresent
+    tag: 7.16.2
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 8000Mi
+    requests:
+      cpu: 500m
+      memory: 2000Mi
+kibana:
+  appsName: kibana
+  service:
+    type: NodePort
+    port: 5601
+    targetPort: 5601
+    nodePort: 30056
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: kibana
+    pullPolicy: IfNotPresent
+    tag: 7.16.2
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 400m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+skywalkingoap:
+  appsName: skywalkingoap
+  service:
+    type: NodePort
+    grpc:
+      port: 11800
+      targetPort: 11800
+      nodePort: 30006
+    rest:
+      port: 12800
+      targetPort: 12800
+      nodePort: 30007
+  jvm: -Xmx4g -Xms2g
+  eshost: elasticsearch-master:9200
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: skywalking-oap-server
+    pullPolicy: IfNotPresent
+    tag: 8.6.0-es7
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 4000Mi
+    requests:
+      cpu: 50m
+      memory: 100Mi
+oapui:
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 8080
+    nodePort: 30009
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: skywalking-ui
+    pullPolicy: IfNotPresent
+    tag: 8.6.0
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+nacos:
+  appsName: nacos
+  service:
+    type: NodePort
+    oldraftrpc:
+      port: 7848
+      targetPort: 7848
+      nodePort: 30049
+    server:
+      port: 8848
+      targetPort: 8848
+      nodePort: 30047
+    clientrpc:
+      port: 9848
+      targetPort: 9848
+      nodePort: 30050
+    raftrpc:
+      port: 9849
+      targetPort: 9849
+      nodePort: 30048
+  mysql:
+    host: 10.20.31.111
+    dbname: nacos
+    port: 3306
+    user: root
+    password: ccn123 
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: nacos-server
+    pullPolicy: IfNotPresent
+    tag: v2.2.3
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 4000Mi
+    requests:
+      cpu: 500m
+      memory: 1000Mi
+logstash:
+  appsName: logstash
+  service:
+    type: ClusterIP
+    port: 9198
+    targetPort: 9198
+  kafkahost: 172.1.1.220:30092
+  logeshost: 172.1.1.221:30192
+  appeshost: 172.1.0.47:9200
+  appespasswd: uW9SEpDn*ZETK3JF
+  jvm: -Xms512m -Xmx3000m
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: logstash
+    pullPolicy: IfNotPresent
+    tag: 7.16.2
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 400m
+      memory: 1000Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
+nginx:
+  appsName: nginx
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 80
+    nodePort: 32081
+  nodename: node1
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: nginxlua
+    pullPolicy: IfNotPresent
+    tag: v9
+    imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+filebeat:
+  image:
+    repository: harbor92.yesno.com.cn
+    project: public
+    servicename: filebeat
+    pullPolicy: IfNotPresent
+    tag: 7.16.2
+    imagePullSecrets: []

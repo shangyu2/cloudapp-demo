@@ -1,0 +1,132 @@
+apiVersion: v1  
+kind: ConfigMap  
+metadata:  
+  name: logstash-conf
+data:  
+  logstash.conf: |
+    input {
+        gelf {
+            port => 5044
+        }
+        kafka {
+            bootstrap_servers => "{{ .Values.logstash.kafkahost }}"
+            group_id => "filebeat"
+            client_id => "logstash"
+            auto_offset_reset => "earliest"
+            topics => ["filebeat"]
+            add_field => {"logs_type" => "filebeat"}
+            codec => json { charset => "UTF-8" }
+        }
+    }
+    filter {
+       if "appName" in [message] {
+         json {
+              source => "message"
+         }
+       }
+       else{
+         if "Full GC" in [message]{
+         
+           grok{
+               match => { "message" => 
+               "%{TIMESTAMP_ISO8601:@timestamp}: %{NUMBER:jvm_time}: \[%{DATA:gc_type} \(%{DATA:gc_cause}\) %{DATA:gc_time}: %{NUMBER:jvm_time1}: \[%{DATA:gc_collector}: %{NUMBER:young_generation_before}K->%{NUMBER:young_generation_after}K\(%{DATA:young_generation_total}K\), %{NUMBER:collection_time} .*?\] %{NUMBER:heap_before}K->%{NUMBER:heap_after}K\(%{DATA:heap_total}K\), \[%{DATA:partten1}: %{NUMBER:partten2}K->%{NUMBER:partten3}K\(%{DATA:partten4}K\)], %{NUMBER:gc_duration} .*?\] \[.*?\: .*?\=%{NUMBER:cpu_time} .*?\=%{NUMBER:system_time}\, .*?\=%{NUMBER:clock_time} .*?\] " 
+               }
+           }
+         }
+         else if "GC" in [message]{
+         
+           grok{
+               match => { "message" => 
+               "%{TIMESTAMP_ISO8601:@timestamp}: %{NUMBER:jvm_time}: \[%{DATA:gc_type} \(%{DATA:gc_cause}\) \[%{DATA:gc_collector}: %{NUMBER:young_generation_before}K->%{NUMBER:young_generation_after}K\(%{NUMBER:young_generation_total}K\)] %{NUMBER:heap_before}K->%{NUMBER:heap_after}K\(%{NUMBER:heap_total}K\), %{NUMBER:gc_duration} .*?\] \[.*?\: .*?\=%{NUMBER:cpu_time} .*?\=%{NUMBER:system_time}\, .*?\=%{NUMBER:clock_time} .*?\] " 
+               }
+           }
+         }
+         else{
+           grok{
+               match => { "message" => "\s*%{TIMESTAMP_ISO8601:@timestamp}: \s*%{NUMBER:relative}: \s*\[%{DATA:msg}\]" }
+           }
+         }
+         
+         ruby {
+             code => "
+                path = event.get('log')['file']['path']
+                puts format('path = %<path>s', path: path)
+                if (!path.nil?) && (!path.empty?)
+                    event.set('app', path.split('/')[-3])
+                    event.set('env', path.split('/')[-2])
+                end
+             "
+          }
+       }
+       
+       date {
+            match => ["date", "ISO8601", "yyyy-MM-dd HH:mm:ss,SSS"] 
+            target => "@timestamp"
+            locale => "cn"
+         }
+    }
+    filter {
+    
+      if "_jsonparsefailure" in [tags] {
+            drop {}
+      }
+      
+      if [trace] and [trace][http.req_header.x-request-source] and [trace][http.req_header.x-request-source] == "PERFORMANCE" {
+            drop {}
+      }
+      
+      if [trace] and [trace][mq.header.x-request-source] and [trace][mq.header.x-request-source] == "PERFORMANCE" {
+            drop {}
+      }
+    
+    }
+    output {
+    
+        if [type] and [type] == "audit" {
+        
+            elasticsearch {
+                hosts => ["{{ .Values.logstash.appeshost }}"]
+                user => "elastic"
+                password => "{{ .Values.logstash.appespasswd }}"
+                index => "audit-%{[appName]}-%{+YYYY.MM.dd}"
+                action => "create"
+            }
+        }
+        else if [type] and [type] == "automated_test" {
+        
+            elasticsearch {
+                hosts => ["{{ .Values.logstash.logeshost }}"]
+                index => "automated-test-%{+YYYY.MM.dd}"
+                action => "create"
+                manage_template => true
+                template => "/usr/share/logstash/template/automated-test-log-template.json"
+                template_name => "automated-test-log-template"
+                template_overwrite => true
+            }
+        }
+        else {
+    
+            if [appName] {
+    	      #stdout{ codec => json }
+              elasticsearch {
+                  hosts => ["{{ .Values.logstash.logeshost }}"]
+                  index => "hivelog-%{[appName]}-%{+YYYY.MM.dd}"
+                  action => "create"
+                  manage_template => true
+                  template => "/usr/share/logstash/template/hive-log-template.json"
+                  template_name => "hive-log-template"
+                  template_overwrite => true
+              }
+            }
+            else{
+            
+              elasticsearch {
+                  hosts => ["{{ .Values.logstash.logeshost }}"]
+                  index => "gclog-%{[app]}-%{+YYYY.MM.dd}"
+                  action => "create"
+              }
+            }
+        }
+    }
+
+

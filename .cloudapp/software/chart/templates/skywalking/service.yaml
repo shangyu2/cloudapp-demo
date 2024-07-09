@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "skywalkingoap.selectorLabels" . | nindent 4 }}
+  name: skywalking-oap
+spec:
+  ports:
+  - name: grpc
+    port: {{ .Values.skywalkingoap.service.grpc.port }}
+    protocol: TCP
+    targetPort: {{ .Values.skywalkingoap.service.grpc.targetPort }}
+  - name: rest
+    port: {{ .Values.skywalkingoap.service.rest.port }}
+    protocol: TCP
+    targetPort: {{ .Values.skywalkingoap.service.rest.targetPort }}
+  selector:
+    {{- include "skywalkingoap.selectorLabels" . | nindent 4 }}
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "skywalkingoap.selectorLabels" . | nindent 4 }}
+  name: np-skywalking-oap
+spec:
+  ports:
+  - name: grpc
+    port: {{ .Values.skywalkingoap.service.grpc.port }}
+    nodePort: {{ .Values.skywalkingoap.service.grpc.nodePort }}
+    protocol: TCP
+    targetPort: {{ .Values.skywalkingoap.service.grpc.targetPort }}
+  - name: rest
+    port: {{ .Values.skywalkingoap.service.rest.port }}
+    nodePort: {{ .Values.skywalkingoap.service.rest.nodePort }}
+    protocol: TCP
+    targetPort: {{ .Values.skywalkingoap.service.rest.targetPort }}
+  selector:
+    {{- include "skywalkingoap.selectorLabels" . | nindent 4 }}
+  type: {{ .Values.skywalkingoap.service.type }}

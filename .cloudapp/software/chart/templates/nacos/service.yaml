@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "nacos.selectorLabels" . | nindent 4 }}
+  name: nacos-headless
+spec:
+  ports:
+  - port: {{ .Values.nacos.service.server.port }}
+    name: server
+    targetPort: {{ .Values.nacos.service.server.port }}
+  - port: {{ .Values.nacos.service.clientrpc.port }}
+    name: client-rpc
+    targetPort: {{ .Values.nacos.service.clientrpc.port }}
+  - port: {{ .Values.nacos.service.raftrpc.port }}
+    name: raft-rpc
+    targetPort: {{ .Values.nacos.service.raftrpc.port }}
+  - port: {{ .Values.nacos.service.oldraftrpc.port }}
+    name: old-raft-rpc
+    targetPort: {{ .Values.nacos.service.oldraftrpc.port }}
+  selector:
+    {{- include "nacos.selectorLabels" . | nindent 4 }}
+  type: ClusterIP
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "nacos.selectorLabels" . | nindent 4 }}
+  name: np-nacos-headless
+spec:
+  ports:
+  - port: {{ .Values.nacos.service.server.port }}
+    nodePort: {{ .Values.nacos.service.server.nodePort }}
+    name: server
+    targetPort: {{ .Values.nacos.service.server.port }}
+  - port: {{ .Values.nacos.service.clientrpc.port }}
+    nodePort: {{ .Values.nacos.service.clientrpc.nodePort }}
+    name: client-rpc
+    targetPort: {{ .Values.nacos.service.clientrpc.port }}
+  - port: {{ .Values.nacos.service.raftrpc.port }}
+    nodePort: {{ .Values.nacos.service.raftrpc.nodePort }}
+    name: raft-rpc
+    targetPort: {{ .Values.nacos.service.raftrpc.port }}
+  - port: {{ .Values.nacos.service.oldraftrpc.port }}
+    nodePort: {{ .Values.nacos.service.oldraftrpc.nodePort }}
+    name: old-raft-rpc
+    targetPort: {{ .Values.nacos.service.oldraftrpc.port }}
+  selector:
+    {{- include "nacos.selectorLabels" . | nindent 4 }}
+  type: {{ .Values.nacos.service.type }}

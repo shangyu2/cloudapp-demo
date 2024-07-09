@@ -1,0 +1,36 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: skywalkingoap
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "skywalkingoap.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "skywalkingoap.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.skywalkingoap.image.servicename }}
+          image: "{{ .Values.skywalkingoap.image.repository }}/{{ .Values.skywalkingoap.image.project }}/{{ .Values.skywalkingoap.image.servicename }}:{{ .Values.skywalkingoap.image.tag  }}"
+          imagePullPolicy: {{ .Values.skywalkingoap.image.pullPolicy }}
+          env:
+            - name: JAVA_OPTS
+              value: "{{ .Values.skywalkingoap.jvm }}"
+            - name: SW_CLUSTER
+              value: standalone
+            - name: SW_STORAGE
+              value: elasticsearch7
+            - name: SW_STORAGE_ES_CLUSTER_NODES
+              value: {{ .Values.skywalkingoap.eshost }}
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.skywalkingoap.service.grpc.port }}
+              protocol: TCP
+            - name: rest
+              containerPort: {{ .Values.skywalkingoap.service.rest.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.skywalkingoap.resources | nindent 12 }}

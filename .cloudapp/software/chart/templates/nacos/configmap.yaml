@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nacos-cm
+data:
+  mysql.host: "{{ .Values.nacos.mysql.host }}"
+  mysql.db.name: "{{ .Values.nacos.mysql.dbname }}"
+  mysql.port: "{{ .Values.nacos.mysql.port }}"
+  mysql.user: "{{ .Values.nacos.mysql.user }}"
+  mysql.password: "{{ .Values.nacos.mysql.password }}"

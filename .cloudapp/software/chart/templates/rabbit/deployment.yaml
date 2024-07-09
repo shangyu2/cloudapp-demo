@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: rabbit
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "rabbit.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "rabbit.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.rabbit.image.servicename }}
+          image: "{{ .Values.rabbit.image.repository }}/{{ .Values.rabbit.image.project }}/{{ .Values.rabbit.image.servicename }}:{{ .Values.rabbit.image.tag  }}"
+          volumeMounts:
+            - name: "rabbitmq-data"
+              mountPath: "/var/lib/rabbitmq"
+          imagePullPolicy: {{ .Values.rabbit.image.pullPolicy }}
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: {{ .Values.rabbit.rabbitmq_user | quote }}
+            - name: RABBITMQ_DEFAULT_PASS
+              value: {{ .Values.rabbit.rabbitmq_pass | quote }}
+          ports:
+            - name: rabbita
+              containerPort: {{ .Values.rabbit.service.amqp.port }}
+              protocol: TCP
+            - name: rabbitb
+              containerPort: {{ .Values.rabbit.service.manager.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.rabbit.resources | nindent 12 }}
+      restartPolicy: Always
+      hostname: rabbit-745cd7b864-w7md7
+      volumes:
+        - name: "rabbitmq-data"
+          persistentVolumeClaim:
+            claimName: {{ .Values.rabbit.appsName }}
