@@ -319,3 +319,9 @@ filebeat:
     pullPolicy: IfNotPresent
     tag: 7.16.2
     imagePullSecrets: []
+
+# 拉取镜像的账号信息
+cloudappImageCredentials:
+  registry: ""
+  username: ""
+  password: ""
