@@ -1,10 +1,10 @@
 resource "tencentcloud_elasticsearch_instance" "foo" {
   instance_name       = "${var.app_name}-elasticsearch"
-  availability_zone   = var.app_target.availability_zone
+  availability_zone   = var.network_source == "exist" ? var.app_network_vpc.availability_zone : var.app_zone.zone
   version             = "7.14.2"
-  vpc_id              = var.app_target.vpc.id
-  subnet_id           = var.app_target.subnet.id
-  password            = "Test12345"
+  vpc_id              = var.network_source == "exist" ? var.app_network_vpc.vpc.id : tencentcloud_vpc.main.id
+  subnet_id           = var.network_source == "exist" ? var.app_network_vpc.subnet.id : tencentcloud_subnet.main.id
+  password            = random_password.password_for_es.result
   license_type        = "basic"
   charge_type         = var.charge_type == "PREPAID" ? "PREPAID" : "POSTPAID_BY_HOUR"
   charge_period       = var.charge_perpaid_period

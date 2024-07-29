@@ -48,7 +48,7 @@ variable "app_zone" {
 }
 
 # 用户选择的安装目标位置，VPC 和子网，在 package.yaml 中定义了输入组件
-variable "app_target" {
+variable "app_network_vpc" {
   type = object({
     region            = string
     availability_zone = string
@@ -107,4 +107,9 @@ variable "charge_type" {
 variable "charge_perpaid_period" {
   type    = number
   default = 1
+}
+
+variable "network_source" {
+  type    = string
+  default = ""
 }
