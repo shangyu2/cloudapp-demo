@@ -13,6 +13,11 @@ resource "tencentcloud_kubernetes_cluster" "tke-cluster1" {
   cluster_level           = "L5"
   cluster_version         = "1.28.3"
 
+  # cfs 扩展组件
+  extension_addon {
+    name  = "CFS"
+    param = "{\"kind\":\"App\",\"spec\":{\"chart\":{\"chartName\":\"cfs\",\"chartVersion\":\"1.1.5\"},\"values\":{\"values\":[],\"rawValues\":\"e30=\",\"rawValuesType\":\"json\"}}}"
+  }
 
   worker_config {
     count                               = 2
