@@ -1,0 +1,14 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: appdata-nfs
+parameters:
+  pgroupid: pgroupbasic
+  storagetype: SD
+  subnetid: "{{ .Values.app.subnetid }}"
+  vers: "3"
+  vpcid: "{{ .Values.app.vpcid }}"
+  zone: "{{ .Values.app.zone }}"
+provisioner: com.tencent.cloud.csi.cfs
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
