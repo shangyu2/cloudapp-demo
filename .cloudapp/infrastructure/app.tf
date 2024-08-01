@@ -18,5 +18,10 @@ resource "cloudapp_helm_app" "app" {
         password = tencentcloud_mysql_instance.mysql.root_password
       }
     }
+    app = {
+      subnetid = tencentcloud_subnet.main.id
+      vpcid  =  tencentcloud_vpc.main.id
+      zone = var.network_source == "exist" ? var.app_network_vpc.availability_zone : var.app_zone.zone
+    }
   }
 }
