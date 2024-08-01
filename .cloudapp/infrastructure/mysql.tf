@@ -18,4 +18,9 @@ resource "tencentcloud_mysql_instance" "mysql" {
   charge_type       = var.charge_type
   prepaid_period    = var.charge_perpaid_period
   auto_renew_flag   = var.charge_perpaid_auto_renew == true ? 1 : 0
+
+  parameters = {
+    character_set_server = "UTF8"
+  }
+
 }
