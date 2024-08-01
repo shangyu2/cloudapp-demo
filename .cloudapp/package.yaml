@@ -3,6 +3,11 @@ id: pkg-jtn0an2h
 
 # 自定义安装参数，通过 widget 来声明安装表单获取
 args:
+  - name: app_zone
+    widget: region-and-zone-select
+    label: 地域和可用区
+    description: 云资源将部署在选择的可用区
+    
   - name: network_source
     label: 网络（VPC）和安全组创建方式
     description: 选择创建方式
@@ -13,15 +18,6 @@ args:
         value: exist
       - label: 创建
         value: new
-
-  - name: app_zone
-    widget: region-and-zone-select
-    label: 地域和可用区
-    description: 云资源将部署在选择的可用区
-    when:
-      - eq: 
-          a: ${network_source}
-          b: "new"
 
   - name: app_network_vpc
     label: 安装网络
