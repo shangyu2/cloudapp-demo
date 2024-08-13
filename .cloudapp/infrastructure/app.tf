@@ -19,7 +19,7 @@ resource "cloudapp_helm_app" "app" {
       }
     }
     app = {
-      subnetid = ar.network_source == "exist" ? var.app_network_vpc.subnet.id : tencentcloud_subnet.main.id
+      subnetid = var.network_source == "exist" ? var.app_network_vpc.subnet.id : tencentcloud_subnet.main.id
       vpcid  =  var.network_source == "exist" ? var.app_network_vpc.vpc.id : tencentcloud_vpc.main.id
       zone = var.network_source == "exist" ? var.app_network_vpc.availability_zone : var.app_zone.zone
     }
